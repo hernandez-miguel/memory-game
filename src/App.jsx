@@ -1,34 +1,76 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { first, shuffle } from 'lodash';
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const N = 8;
+  const arr = Array.from({length: N}, (_, index) => index + 1);
+  
+  const [cards, setCards] = useState(shuffle([...arr, ...arr]));
+  const [clicks, setClicks] = useState(0);
+  const [won, setWon] = useState(false);
+  const [activeCards, setActiveCards] = useState([]);
+  const [foundPairs, setFoundPairs] = useState([]);
+  
+  function flipCard(index) {
+    if(won) {
+      setCards(shuffle([...arr, ...arr]));
+      setFoundPairs([]);
+      setWon(false);
+    }
+
+    if (activeCards.length === 0) {
+      setActiveCards([index]);
+    }
+
+    if (activeCards.length === 1) {
+      const firstIndex = activeCards[0];
+      const secondIndex = index;
+
+      if (cards[firstIndex] === cards[secondIndex]) {
+        setFoundPairs([...foundPairs, firstIndex, secondIndex])
+       
+        if (foundPairs.length + 2 === cards.length) {
+          setWon(true);
+        }
+      }
+
+      setActiveCards([...activeCards, index])
+    }
+
+    if (activeCards.length === 2) {
+      setActiveCards([index]);
+    }
+
+    setClicks(clicks + 1);
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div>
+      <h1>Match the Numbers</h1>
+      <div className="board">
+        {cards.map((card, index) => {
+          const flippedToFront = activeCards.indexOf(index) !== -1 || foundPairs.indexOf(index) !== -1;
+          return(
+            <div
+              key={index}
+              className={"card-outer " + (flippedToFront ? 'flipped' : '')}
+              onClick={() => flipCard(index)}
+            >
+              <div className="card">
+                <div className="front">
+                  <p>{card}</p>
+                </div>
+                <div className="back"/>
+              </div>
+            </div>
+        )})}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className="gameStats">
+        {won && (<>You Won the Game! <br/></>)}
+        clicks: {clicks} Found Pairs: {foundPairs.length/2}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
