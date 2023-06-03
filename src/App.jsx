@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { first, shuffle } from 'lodash';
+import { shuffle } from 'lodash';
 import './App.css'
 
 function App() {
