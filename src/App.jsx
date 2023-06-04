@@ -7,16 +7,17 @@ function App() {
   const arr = Array.from({length: N}, (_, index) => index + 1);
   
   const [cards, setCards] = useState(shuffle([...arr, ...arr]));
-  const [clicks, setClicks] = useState(0);
-  const [won, setWon] = useState(false);
   const [activeCards, setActiveCards] = useState([]);
   const [foundPairs, setFoundPairs] = useState([]);
-  
+  const [clicks, setClicks] = useState(0);
+  const [won, setWon] = useState(false);
+
   function flipCard(index) {
     if(won) {
       setCards(shuffle([...arr, ...arr]));
       setFoundPairs([]);
       setWon(false);
+      setClicks(1);
     }
 
     if (activeCards.length === 0) {
@@ -28,11 +29,11 @@ function App() {
       const secondIndex = index;
 
       if (cards[firstIndex] === cards[secondIndex]) {
-        setFoundPairs([...foundPairs, firstIndex, secondIndex])
-       
         if (foundPairs.length + 2 === cards.length) {
           setWon(true);
         }
+
+        setFoundPairs([...foundPairs, firstIndex, secondIndex])
       }
 
       setActiveCards([...activeCards, index])
@@ -42,7 +43,9 @@ function App() {
       setActiveCards([index]);
     }
 
-    setClicks(clicks + 1);
+    if(!won) {
+      setClicks(clicks + 1);
+    }
   }
 
   return (
